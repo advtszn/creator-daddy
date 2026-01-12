@@ -2,11 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
-  serverExternalPackages: [
-    "chromadb",
-    "@chroma-core/google-gemini",
-    "mongoose",
-  ],
+  serverExternalPackages: ["chromadb", "mongoose"],
+  transpilePackages: ["@chroma-core/google-gemini"],
   images: {
     remotePatterns: [
       {

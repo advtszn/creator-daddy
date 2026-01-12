@@ -36,7 +36,7 @@ This is a Next.js 16 app using the App Router that helps users find Instagram cr
 - Uses Google Gemini embeddings (`gemini-embedding-001`)
 
 **AI/ML Services**
-- Groq LLM (`openai/gpt-oss-120b`) for chat
+- Gemini LLM (`gemini-3-flash-preview`) for chat
 - Voyage AI (`rerank-2.5`) for result reranking
 - TOON format encoding for document serialization before reranking
 
@@ -53,6 +53,5 @@ This is a Next.js 16 app using the App Router that helps users find Instagram cr
 
 - `MONGODB_URI`: MongoDB connection string
 - `CHROMA_API_KEY`, `CHROMA_TENANT_ID`: ChromaDB cloud credentials
-- `GOOGLE_GEMINI_API_KEY`: For embeddings
-- `GROQ_API_KEY`: For LLM
+- `GOOGLE_GEMINI_API_KEY`: For embeddings and LLM
 - `VOYAGEAI_API_KEY`: For reranking
