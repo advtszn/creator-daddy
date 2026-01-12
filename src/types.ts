@@ -30,5 +30,5 @@ export interface Creator extends SocialProfile {
  * Tool output types
  */
 export type GetCreatorsToolOutput =
-  | { success: true; creators: Creator[] }
+  | { success: true; creators: (Creator & { relevanceScore: number })[] }
   | { success: false; error: string; creators: [] };

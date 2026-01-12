@@ -220,10 +220,12 @@ export const getCreatorsTool = tool({
       } satisfies GetCreatorsToolOutput;
     }
 
-    const creators = rerankResult.data.data?.map((document) => ({
-      ...enriched[document.index!],
-      relevanceScore: document.relevanceScore,
-    })) as Creator[];
+    const creators = (
+      rerankResult.data.data?.map((document) => ({
+        ...enriched[document.index!],
+        relevanceScore: document.relevanceScore,
+      })) as (Creator & { relevanceScore: number })[]
+    ).filter((creator) => creator.relevanceScore >= 0.6);
 
     console.log(creators);
 

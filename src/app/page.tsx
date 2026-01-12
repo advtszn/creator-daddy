@@ -76,9 +76,12 @@ export default function Home() {
                         return (
                           <div key={index} className="flex flex-col gap-3">
                             <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                              <CheckCircleIcon className="size-4 text-green-500" />
+                              <CheckCircleIcon className="size-4 text-green-500" />{" "}
+                              <span>{output.creators.length} creators found</span>
                             </div>
-                            <CreatorGrid creators={output.creators as Creator[]} />
+                            <CreatorGrid
+                              creators={output.creators as Creator[]}
+                            />
                           </div>
                         );
                       }

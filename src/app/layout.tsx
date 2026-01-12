@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import Link from "next/link";
 import "~/styles/globals.css";
+import { AuthGate } from "~/components/auth-gate";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -22,12 +23,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${spaceGrotesk.variable} antialiased dark`}>
-        <header className="fixed z-50 w-full bg-background p-4 border-b">
-          <Link className="text-4xl font-bold" href="/">
-            +_+ Creator Daddy
-          </Link>
-        </header>
-        {children}
+        <AuthGate>
+          <header className="fixed z-50 w-full bg-background p-4 border-b">
+            <Link className="text-4xl font-bold" href="/">
+              +_+ Creator Daddy
+            </Link>
+          </header>
+          {children}
+        </AuthGate>
       </body>
     </html>
   );
