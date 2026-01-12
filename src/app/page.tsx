@@ -1,65 +1,127 @@
-import Image from "next/image";
+"use client";
+
+import { useChat } from "@ai-sdk/react";
+import { SearchIcon, CheckCircleIcon, LoaderIcon } from "lucide-react";
+import { useState } from "react";
+import type { ChatMessage } from "~/ai/tools";
+import type { Creator } from "~/ai/tools/get-creators.tool.ai";
+import {
+  Conversation,
+  ConversationContent,
+  ConversationEmptyState,
+  ConversationScrollButton,
+} from "~/components/ai-elements/conversation";
+import { MessageResponse } from "~/components/ai-elements/message";
+import { CreatorGrid } from "~/components/creator-card";
 
 export default function Home() {
+  const [input, setInput] = useState("");
+  const { messages, sendMessage, status } = useChat<ChatMessage>();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+    sendMessage({ text: input });
+    setInput("");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="flex h-screen flex-col">
+      <Conversation className="flex-1">
+        {messages.length === 0 ? (
+          <ConversationEmptyState className="items-start justify-start p-4 pt-24 text-left">
+            <h1 className="from-foreground to-background/0 max-w-1/2 bg-linear-to-br bg-clip-text text-6xl font-bold text-transparent">
+              Looking for a creator? Daddy can fix you
+            </h1>
+          </ConversationEmptyState>
+        ) : (
+          <ConversationContent className="max-w-5xl pb-24 pt-24">
+            {messages.map((message, idx) => (
+              <div key={idx} className="flex flex-col gap-2">
+                <span className="text-muted-foreground text-sm">
+                  {message.role === "user" ? "You" : "Daddy"}
+                </span>
+                {message.parts.map((part, index) => {
+                  switch (part.type) {
+                    case "text":
+                      return (
+                        <MessageResponse key={index} className="text-lg">
+                          {part.text}
+                        </MessageResponse>
+                      );
+
+                    case "tool-getCreators": {
+                      const { state, input: toolInput } = part;
+
+                      if (state === "input-streaming" || state === "input-available") {
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center gap-2 text-muted-foreground text-sm"
+                          >
+                            <LoaderIcon className="size-4 animate-spin" />
+                            <span>Searching for "{toolInput?.query}"...</span>
+                          </div>
+                        );
+                      }
+
+                      if (state === "output-available") {
+                        const output = part.output;
+
+                        return (
+                          <div key={index} className="flex flex-col gap-3">
+                            <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                              <CheckCircleIcon className="size-4 text-green-500" />
+                              <span>
+                                Found {output.totalFound} creators
+                              </span>
+                            </div>
+                            <CreatorGrid creators={output.creators as Creator[]} />
+                          </div>
+                        );
+                      }
+
+                      if (state === "output-error") {
+                        return (
+                          <div
+                            key={index}
+                            className="text-destructive text-sm"
+                          >
+                            Error: {part.errorText}
+                          </div>
+                        );
+                      }
+
+                      return null;
+                    }
+
+                    default:
+                      return null;
+                  }
+                })}
+              </div>
+            ))}
+          </ConversationContent>
+        )}
+        <ConversationScrollButton />
+      </Conversation>
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-background fixed inset-x-0 bottom-0"
+      >
+        <div className="relative">
+          <SearchIcon className="absolute top-1/2 left-6 size-5 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Describe the creator you're looking for..."
+            disabled={status !== "ready"}
+            className="border-foreground/20 w-full border-t bg-transparent py-6 pr-6 pl-14 outline-none disabled:opacity-50"
+          />
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </form>
+    </main>
   );
 }
