@@ -1,7 +1,8 @@
+import type { Creator } from "~/types";
 import { cn } from "~/lib/utils";
 
 type CreatorCardProps = {
-  creator: any;
+  creator: Creator;
   className?: string;
 };
 
@@ -56,7 +57,7 @@ export function CreatorCard({ creator, className }: CreatorCardProps) {
 }
 
 type CreatorGridProps = {
-  creators: any[];
+  creators: Creator[];
   className?: string;
 };
 

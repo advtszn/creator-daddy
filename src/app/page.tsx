@@ -1,10 +1,12 @@
+/** biome-ignore-all lint/suspicious/noArrayIndexKey: <explanation> */
 "use client";
 
 import { useChat } from "@ai-sdk/react";
-import { SearchIcon, CheckCircleIcon, LoaderIcon } from "lucide-react";
+import { CheckCircleIcon, LoaderIcon, SearchIcon } from "lucide-react";
 import { useState } from "react";
 import type { ChatMessage } from "~/ai/tools";
-import type { Creator } from "~/ai/tools/get-creators.tool.ai";
+import type { Creator } from "~/types";
+
 import {
   Conversation,
   ConversationContent,
@@ -31,7 +33,7 @@ export default function Home() {
         {messages.length === 0 ? (
           <ConversationEmptyState className="items-start justify-start p-4 pt-24 text-left">
             <h1 className="from-foreground to-background/0 max-w-1/2 bg-linear-to-br bg-clip-text text-6xl font-bold text-transparent">
-              Looking for a creator? Daddy can fix you
+              Looking for a creator? <br /> Daddy can fix you
             </h1>
           </ConversationEmptyState>
         ) : (
@@ -53,7 +55,10 @@ export default function Home() {
                     case "tool-getCreators": {
                       const { state, input: toolInput } = part;
 
-                      if (state === "input-streaming" || state === "input-available") {
+                      if (
+                        state === "input-streaming" ||
+                        state === "input-available"
+                      ) {
                         return (
                           <div
                             key={index}
@@ -72,9 +77,6 @@ export default function Home() {
                           <div key={index} className="flex flex-col gap-3">
                             <div className="flex items-center gap-2 text-muted-foreground text-sm">
                               <CheckCircleIcon className="size-4 text-green-500" />
-                              <span>
-                                Found {output.totalFound} creators
-                              </span>
                             </div>
                             <CreatorGrid creators={output.creators as Creator[]} />
                           </div>
@@ -83,10 +85,7 @@ export default function Home() {
 
                       if (state === "output-error") {
                         return (
-                          <div
-                            key={index}
-                            className="text-destructive text-sm"
-                          >
+                          <div key={index} className="text-destructive text-sm">
                             Error: {part.errorText}
                           </div>
                         );
