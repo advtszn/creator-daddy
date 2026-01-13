@@ -6,14 +6,20 @@ import { Input } from "~/components/ui/input";
 import { verifyPassphrase } from "~/app/actions/auth";
 
 const AUTH_STORAGE_KEY = "creator-daddy-auth";
+const IS_DEV = process.env.NODE_ENV === "development";
 
 export function AuthGate({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(
+    IS_DEV ? true : null
+  );
   const [passphrase, setPassphrase] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    // Skip auth check in development
+    if (IS_DEV) return;
+
     const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
     setIsAuthenticated(stored === "true");
   }, []);
